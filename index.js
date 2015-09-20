@@ -48,9 +48,9 @@ var ConversationsController = {
   create: function(request, reply) {
     dialog.conversation({client_id: request.payload.client_id, dialog_id: dialog_id}, function (err, dialogs) {
       if (err)
-        reply('error:', err);
+        reply({error: err});
       else
-        reply(JSON.stringify(dialogs, null, 2));
+        reply(dialogs);
     });
   },  
 
@@ -61,9 +61,9 @@ var ConversationsController = {
         input: request.payload.input
     }, function (err, dialogs) {
       if (err)
-        reply('error:', err);
+        reply({error: err});
       else
-        reply(JSON.stringify(dialogs, null, 2));
+        reply(dialogs);
     });
   },
 
