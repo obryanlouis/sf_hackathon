@@ -48,11 +48,11 @@ var ConversationsController = {
   },
 
   create: function(request, reply) {
-    dialog.conversation({client_id: request.payload.client_id, dialog_id: dialog_id}, function (err, dialogs) {
+    dialog.conversation({ dialog_id: dialog_id}, function (err, dialogs) {
       if (err)
-        reply('error:', err);
+        reply({error: err});
       else
-        reply(JSON.stringify(dialogs, null, 2));
+        reply(dialogs);
     });
   },  
 
@@ -71,9 +71,9 @@ var ConversationsController = {
         input: request.payload.input
     }, function (err, dialogs) {
       if (err)
-        reply('error:', err);
+        reply({error: err});
       else
-        reply(JSON.stringify(dialogs, null, 2));
+        reply(dialogs);
     });
   },
 
@@ -99,12 +99,24 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/walmart',
+    path: '/walmart/search',
     handler: function (request, reply) {
-      walmart.search(request.query.search, {'facet': 'on', 'facet.range': 'price:[150 TO 1200]'}).then(function(item) {
+      min = request.query.min || 0
+      max = request.query.max || 5000
+      walmart.search(request.query.q, {'facet': 'on', 'facet.range': 'price:[' + min + ' TO ' + max + ']'}).then(function(item) {
           walmart.recommendations(item.items[0].itemId).then(function(recommendation) {
             reply({items: item.items, recommendations: recommendation});
           });
+      });
+
+    }
+});
+server.route({
+    method: 'GET',
+    path: '/walmart/recommendations',
+    handler: function (request, reply) {
+      walmart.recommendations(request.query.q).then(function(item) {
+        reply({recommendations: recommendation});
       });
 
     }
