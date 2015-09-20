@@ -103,6 +103,27 @@ server.route({
 });
 server.route({
     method: 'GET',
+    path: '/walmart/trending',
+    handler: function (request, reply) {
+      walmart.feeds.trending().then(function(item) {
+        reply({trending: item.items});
+      });
+
+    }
+});
+
+server.route({
+    method: 'GET',
+    path: '/walmart/vod',
+    handler: function (request, reply) {
+      walmart.feeds.valueOfTheDay().then(function(item) {
+        reply({trending: item.items});
+      });
+
+    }
+});
+server.route({
+    method: 'GET',
     path: '/walmart/recommendations',
     handler: function (request, reply) {
       walmart.recommendations(request.query.q).then(function(item) {
