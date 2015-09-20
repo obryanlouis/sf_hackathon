@@ -91,7 +91,9 @@ server.route({
     method: 'GET',
     path: '/walmart',
     handler: function (request, reply) {
-      walmart.search(request.query.search, {'facet': 'on', 'facet.range': 'price:[150 TO 1200]'}).then(function(item) {
+      min = request.payload ? (request.payload.min || 0) : 0
+      max = request.payload ? (request.payload.max || 5000) :5000
+      walmart.search(request.query.search, {'facet': 'on', 'facet.range': 'price:[' + min + ' TO ' + max + ']'}).then(function(item) {
           walmart.recommendations(item.items[0].itemId).then(function(recommendation) {
             reply({items: item.items, recommendations: recommendation});
           });
