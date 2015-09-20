@@ -4,7 +4,6 @@ var Hapi = require('hapi');
 var resource = require('hapi-resource');
 var walmart = require('walmart')(apiKey);
 var watson = require('watson-developer-cloud');
-var askedShoesQuestion = false;
 
 // Create a server with a host and port
 var server = new Hapi.Server();
@@ -15,7 +14,6 @@ server.connection({
 
 
 dialog_id = 'b3f68f26-3342-403b-b51c-757a5c5e022e';
-shoes_dialog_id = 'ae5a4606-975d-4d0d-971e-bbf5102383cc';
 
 var dialog = watson.dialog({
     username: '4fdb7fb8-908b-47a2-9ced-bf3871a8c9d2',
@@ -48,32 +46,24 @@ var ConversationsController = {
   },
 
   create: function(request, reply) {
-    dialog.conversation({ dialog_id: dialog_id}, function (err, dialogs) {
+    dialog.conversation({client_id: request.payload.client_id, dialog_id: dialog_id}, function (err, dialogs) {
       if (err)
-        reply({error: err});
+        reply('error:', err);
       else
-        reply(dialogs);
+        reply(JSON.stringify(dialogs, null, 2));
     });
   },  
 
   update: function(request, reply) {
-    var input = request.payload.input;
-    if (input.indexOf("shoes") != -1) {
-        if (askedShoesQuestion) {
-            // Change the dialog so that our system 'learns' the right answer to the shoes question
-            dialog_id = shoes_dialog_id;
-        }
-        askedShoesQuestion = true;
-    }
     dialog.conversation({client_id: request.payload.client_id,
         dialog_id: dialog_id,
         conversation_id: request.params.id,
         input: request.payload.input
     }, function (err, dialogs) {
       if (err)
-        reply({error: err});
+        reply('error:', err);
       else
-        reply(dialogs);
+        reply(JSON.stringify(dialogs, null, 2));
     });
   },
 
@@ -99,24 +89,12 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/walmart/search',
+    path: '/walmart',
     handler: function (request, reply) {
-      min = request.query.min || 0
-      max = request.query.max || 5000
-      walmart.search(request.query.q, {'facet': 'on', 'facet.range': 'price:[' + min + ' TO ' + max + ']'}).then(function(item) {
+      walmart.search(request.query.search, {'facet': 'on', 'facet.range': 'price:[150 TO 1200]'}).then(function(item) {
           walmart.recommendations(item.items[0].itemId).then(function(recommendation) {
             reply({items: item.items, recommendations: recommendation});
           });
-      });
-
-    }
-});
-server.route({
-    method: 'GET',
-    path: '/walmart/recommendations',
-    handler: function (request, reply) {
-      walmart.recommendations(request.query.q).then(function(item) {
-        reply({recommendations: recommendation});
       });
 
     }
