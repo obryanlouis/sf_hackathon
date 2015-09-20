@@ -8,7 +8,7 @@ var watson = require('watson-developer-cloud');
 // Create a server with a host and port
 var server = new Hapi.Server();
 server.connection({ 
-    host: 'localhost', 
+    host: (process.env.HOST || 'localhost'),
     port: (process.env.PORT || 5000)
 });
 
