@@ -46,7 +46,7 @@ var ConversationsController = {
   },
 
   create: function(request, reply) {
-    dialog.conversation({client_id: request.payload.client_id, dialog_id: dialog_id}, function (err, dialogs) {
+    dialog.conversation({ dialog_id: dialog_id}, function (err, dialogs) {
       if (err)
         reply({error: err});
       else
