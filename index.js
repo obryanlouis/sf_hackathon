@@ -89,14 +89,24 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/walmart',
+    path: '/walmart/search',
     handler: function (request, reply) {
-      min = request.payload ? (request.payload.min || 0) : 0
-      max = request.payload ? (request.payload.max || 5000) :5000
-      walmart.search(request.query.search, {'facet': 'on', 'facet.range': 'price:[' + min + ' TO ' + max + ']'}).then(function(item) {
+      min = request.query.min || 0
+      max = request.query.max || 5000
+      walmart.search(request.query.q, {'facet': 'on', 'facet.range': 'price:[' + min + ' TO ' + max + ']'}).then(function(item) {
           walmart.recommendations(item.items[0].itemId).then(function(recommendation) {
             reply({items: item.items, recommendations: recommendation});
           });
+      });
+
+    }
+});
+server.route({
+    method: 'GET',
+    path: '/walmart/recommendations',
+    handler: function (request, reply) {
+      walmart.recommendations(request.query.q).then(function(item) {
+        reply({recommendations: recommendation});
       });
 
     }
