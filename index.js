@@ -80,6 +80,15 @@ server.route(
 
 server.route({
     method: 'GET',
+    path: '/',
+    handler: function (request, reply) {
+      reply('hello');
+
+    }
+});
+
+server.route({
+    method: 'GET',
     path: '/walmart',
     handler: function (request, reply) {
       walmart.search(request.query.search, {'facet': 'on', 'facet.range': 'price:[150 TO 1200]'}).then(function(item) {
