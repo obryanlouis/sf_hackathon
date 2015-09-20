@@ -4,6 +4,7 @@ var Hapi = require('hapi');
 var resource = require('hapi-resource');
 var walmart = require('walmart')(apiKey);
 var watson = require('watson-developer-cloud');
+var askedShoesQuestion = false;
 
 // Create a server with a host and port
 var server = new Hapi.Server();
@@ -14,6 +15,7 @@ server.connection({
 
 
 dialog_id = 'b3f68f26-3342-403b-b51c-757a5c5e022e';
+shoes_dialog_id = 'ae5a4606-975d-4d0d-971e-bbf5102383cc';
 
 var dialog = watson.dialog({
     username: '4fdb7fb8-908b-47a2-9ced-bf3871a8c9d2',
@@ -55,6 +57,14 @@ var ConversationsController = {
   },  
 
   update: function(request, reply) {
+    var input = request.payload.input;
+    if (input.indexOf("shoes") != -1) {
+        if (askedShoesQuestion) {
+            // Change the dialog so that our system 'learns' the right answer to the shoes question
+            dialog_id = shoes_dialog_id;
+        }
+        askedShoesQuestion = true;
+    }
     dialog.conversation({client_id: request.payload.client_id,
         dialog_id: dialog_id,
         conversation_id: request.params.id,
